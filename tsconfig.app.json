@@ -12,7 +12,7 @@
       "@pages": ["./src/pages"],
       "@validation": ["/src/utils/index.ts"],
       "@routes": ["/src/router/routes.tsx"],
-      "@service": ["/src/service/index.ts"],
+      "@service": ["/src/service/service.ts"],
       "@modal": ["/src/components/modals/index.tsx"],
       "@ui": ["/src/components/ui/index.tsx"]
     },

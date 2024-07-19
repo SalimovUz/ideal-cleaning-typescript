@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, ChangeEvent } from "react";
 import { FaPencilAlt } from "react-icons/fa";
 import {
   BsFillEnvelopeFill,
@@ -6,10 +6,21 @@ import {
   BsFillShieldLockFill,
 } from "react-icons/bs";
 
-const Index = () => {
+interface UserProfile {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  bio: string;
+  job: string;
+  avatarUrl: string;
+  password: string;
+}
+
+const Index: React.FC = () => {
   const [foto, setFoto] = useState(true);
 
-  const [userProfile, setUserProfile] = useState({
+  const [userProfile, setUserProfile] = useState<UserProfile>({
     name: "",
     email: "",
     phone: "",
@@ -21,15 +32,15 @@ const Index = () => {
   });
 
   useEffect(() => {
-    const userProfileData = {
-      name: localStorage.getItem("username"),
-      email: localStorage.getItem("email"),
-      phone: localStorage.getItem("phone_number"),
+    const userProfileData: UserProfile = {
+      name: localStorage.getItem("username") || "",
+      email: localStorage.getItem("email") || "",
+      phone: localStorage.getItem("phone_number") || "",
       address: "1234 Elm St, Springfield, IL 62704",
       bio: localStorage.getItem("bio") || userProfile.bio,
       job: localStorage.getItem("job") || userProfile.job,
       avatarUrl: localStorage.getItem("avatarUrl") || userProfile.avatarUrl,
-      password: localStorage.getItem("password"),
+      password: localStorage.getItem("password") || "",
     };
     setUserProfile(userProfileData);
   }, []);
@@ -50,12 +61,12 @@ const Index = () => {
     }
   };
 
-  const handleEditAvatar = (event) => {
-    const file = event.target.files[0];
+  const handleEditAvatar = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        const avatarUrl = reader.result;
+        const avatarUrl = reader.result as string;
         setUserProfile({ ...userProfile, avatarUrl });
         localStorage.setItem("avatarUrl", avatarUrl);
         setFoto(true);
@@ -101,7 +112,7 @@ const Index = () => {
                 onClick={handleEditJob}
               >
                 {localStorage.getItem("username")
-                  ? localStorage.getItem("username").charAt(0).toUpperCase()
+                  ? localStorage.getItem("username")?.charAt(0).toUpperCase()
                   : ""}
               </h1>
             )}

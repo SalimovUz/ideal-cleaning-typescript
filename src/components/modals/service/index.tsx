@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Modal, Box, Typography, Button, TextField } from "@mui/material";
-import { Form, Formik } from "formik";
+import { Form, Formik, FormikHelpers } from "formik";
 import { serviceValidationScheme } from "@validation";
 import { service } from "@service";
 import { ToastContainer, toast } from "react-toastify";
@@ -18,13 +18,28 @@ const style = {
   p: 4,
 };
 
-const Service = ({ open, handleClose, item, setData }) => {
-  const initialValues = {
+interface ServiceProps {
+  open: boolean;
+  handleClose: () => void;
+  item: { id?: number; name?: string; price?: number } | null;
+  setData: (data: any) => void;
+}
+
+interface FormValues {
+  name: string;
+  price: string;
+}
+
+const Service: React.FC<ServiceProps> = ({ open, handleClose, item }) => {
+  const initialValues: FormValues = {
     name: item?.name || "",
-    price: item?.price || "",
+    price: item?.price?.toString() || "",
   };
 
-  const handleSubmit = async (values, { setSubmitting }) => {
+  const handleSubmit = async (
+    values: FormValues,
+    { setSubmitting }: FormikHelpers<FormValues>
+  ) => {
     try {
       let response;
       if (item?.id) {

@@ -5,19 +5,29 @@ import {
   DialogContent,
   DialogTitle,
   Button,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
-import  { useState } from "react";
+import { useState, MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../service";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import InputAdornment from "@mui/material/InputAdornment";
-import IconButton from "@mui/material/IconButton";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { Formik, Form } from "formik";
+import { Formik, Form, FormikHelpers } from "formik";
 import * as Yup from "yup";
 
-const Index = () => {
+interface SignInValues {
+  email: string;
+  password: string;
+}
+
+interface VerifyValues {
+  code: string;
+  password: string;
+}
+
+const Index: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [forgotPasswordModalOpen, setForgotPasswordModalOpen] = useState(false);
   const [verifyModalOpen, setVerifyModalOpen] = useState(false);
@@ -43,19 +53,22 @@ const Index = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleMouseDownPassword = (event) => {
+  const handleMouseDownPassword = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   };
 
-  const handleSubmit = async (values, { setSubmitting }) => {
+  const handleSubmit = async (
+    values: SignInValues,
+    { setSubmitting }: FormikHelpers<SignInValues>
+  ) => {
     try {
       const response = await auth.sign_in(values);
       console.log("Response: ", response);
 
       if (response.status === 200) {
-        toast.success("Succesfully!");
+        toast.success("Successfully!");
         localStorage.setItem("access_token", response?.data?.access_token);
-        localStorage.setItem("email", values.email )
+        localStorage.setItem("email", values.email);
         setTimeout(() => {
           navigate("/");
         }, 1500);
@@ -86,7 +99,10 @@ const Index = () => {
     }
   };
 
-  const handleVerifySubmit = async (values, { setSubmitting }) => {
+  const handleVerifySubmit = async (
+    values: VerifyValues,
+    { setSubmitting }: FormikHelpers<VerifyValues>
+  ) => {
     const email = localStorage.getItem("email");
 
     if (!email) {

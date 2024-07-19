@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import {
   Button,
   Modal,
@@ -10,19 +10,24 @@ import {
   FormGroup,
   Label,
 } from "reactstrap";
-import { auth } from "../../../service";
-import { useNavigate } from "react-router-dom";
+import {auth} from "@service";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
-const VerifyCodeModal = ({ isOpen, toggle }) => {
-  const [code, setCode] = useState("");
+interface VerifyCodeModalProps {
+  isOpen: boolean;
+  toggle: () => void;
+}
+
+const VerifyCodeModal: React.FC<VerifyCodeModalProps> = ({ isOpen, toggle }) => {
+  const [code, setCode] = useState<string>("");
   const navigate = useNavigate();
 
-  const [countdown, setCountdown] = useState(60);
+  const [countdown, setCountdown] = useState<number>(60);
 
   useEffect(() => {
-    let timer;
+    let timer: NodeJS.Timeout | undefined;
     if (isOpen && countdown > 0) {
       timer = setInterval(() => {
         setCountdown((prevCountdown) => prevCountdown - 1);
@@ -31,7 +36,9 @@ const VerifyCodeModal = ({ isOpen, toggle }) => {
       toggle();
     }
 
-    return () => clearInterval(timer);
+    return () => {
+      if (timer) clearInterval(timer);
+    };
   }, [isOpen, countdown, toggle]);
 
   useEffect(() => {
@@ -40,11 +47,11 @@ const VerifyCodeModal = ({ isOpen, toggle }) => {
     }
   }, [isOpen]);
 
-  const handleChange = (event) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setCode(event.target.value);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
     if (!code.trim()) {
@@ -61,12 +68,11 @@ const VerifyCodeModal = ({ isOpen, toggle }) => {
       const response = await auth.verify_code(payload);
       if (response.status === 201) {
         toggle();
-        if (navigate("/")) {
-          toast.success("Kod email ga yuborildi!", {});
-        }
+        navigate("/");
+        toast.success("Kod email ga yuborildi!", {});
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast.error("Kod kiritishda xatolik!", {});
     }
   };

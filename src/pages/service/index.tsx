@@ -1,15 +1,29 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "@mui/material";
+import { Button, Pagination } from "@mui/material";
 import { Service } from "@modal";
 import { ServiceTable } from "@ui";
-import { service } from "@service";
-import Pagination from "@mui/material/Pagination";
+import {service} from "@service";
 
-const Index = () => {
+interface Params {
+  limit: number;
+  page: number;
+}
+
+interface ServiceData {
+  id: number;
+  name: string;
+}
+
+interface ServiceResponse {
+  services: ServiceData[];
+  total: number;
+}
+
+const Index: React.FC = () => {
   const [open, setOpen] = useState(false);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<ServiceData[]>([]);
   const [count, setCount] = useState(0);
-  const [params, setParams] = useState({
+  const [params, setParams] = useState<Params>({
     limit: 10,
     page: 1,
   });
@@ -19,10 +33,10 @@ const Index = () => {
 
   const fetchData = async () => {
     try {
-      const response = await service.get(params);
+      const response = await service.get<ServiceResponse>(params);
       if (response.status === 200 && response?.data?.services) {
-        setData(response?.data?.services);
-        let total = Math.ceil(response.data.total / params.limit);
+        setData(response.data.services);
+        const total = Math.ceil(response.data.total / params.limit);
         setCount(total);
       }
     } catch (error) {
@@ -34,11 +48,11 @@ const Index = () => {
     fetchData();
   }, [params]);
 
-  const handleChangePage = (event, value) => {
-    setParams({
-      ...params,
+  const handleChangePage = (event: React.ChangeEvent<unknown>, value: number) => {
+    setParams((prevParams) => ({
+      ...prevParams,
       page: value,
-    });
+    }));
   };
 
   return (
@@ -56,11 +70,7 @@ const Index = () => {
           </Button>
         </div>
         <ServiceTable data={data} />
-        <Pagination
-          count={count}
-          page={params.page}
-          onChange={handleChangePage}
-        />
+        <Pagination count={count} page={params.page} onChange={handleChangePage} />
       </div>
     </>
   );

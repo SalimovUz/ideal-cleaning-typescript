@@ -6,11 +6,16 @@ import Pagination from "@mui/material/Pagination";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const Index = () => {
+interface Params {
+  limit: number;
+  page: number;
+}
+
+const Index: React.FC = () => {
   const [open, setOpen] = useState(false);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<any[]>([]);
   const [count, setCount] = useState(0);
-  const [params, setParams] = useState({
+  const [params, setParams] = useState<Params>({
     limit: 10,
     page: 1,
   });
@@ -23,7 +28,7 @@ const Index = () => {
       const response = await client.get(params);
       if (response.status === 200 && response?.data?.clients_list) {
         setData(response?.data?.clients_list);
-        let total = Math.ceil(response.data.total / params.limit);
+        const total = Math.ceil(response.data.total / params.limit);
         setCount(total);
       }
     } catch (error) {
@@ -35,14 +40,14 @@ const Index = () => {
     getData();
   }, [params]);
 
-  const handleChange = (event, value) => {
+  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setParams({
       ...params,
       page: value,
     });
   };
 
-  const deleteItem = async (client_id, owner_id) => {
+  const deleteItem = async (client_id: number, owner_id: number) => {
     const params = { client_id, owner_id };
 
     try {

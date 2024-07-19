@@ -6,7 +6,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { service } from "@service";
+import service from "../../../service/service";
 import { Service } from "@modal";
 import { useState, useEffect } from "react";
 import editImg from "../../../assets/edit.svg";
@@ -26,22 +26,31 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
   },
-  // hide last border
   "&:last-child td, &:last-child th": {
     border: 0,
   },
 }));
 
-export default function CustomizedTables({ data }) {
-  const [tableData, setTableData] = useState([]);
-  const [edit, setEdit] = useState({});
+interface ServiceItem {
+  id: number;
+  name: string;
+  price: number;
+}
+
+interface CustomizedTablesProps {
+  data: ServiceItem[];
+}
+
+const CustomizedTables: React.FC<CustomizedTablesProps> = ({ data }) => {
+  const [tableData, setTableData] = useState<ServiceItem[]>([]);
+  const [edit, setEdit] = useState<ServiceItem | null>(null);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     setTableData(data);
   }, [data]);
 
-  const deleteItem = async (id) => {
+  const deleteItem = async (id: number) => {
     try {
       const response = await service.delete(id);
       if (response.status === 200) {
@@ -52,14 +61,19 @@ export default function CustomizedTables({ data }) {
     }
   };
 
-  const editItem = (item) => {
+  const editItem = (item: ServiceItem) => {
     setEdit(item);
     setOpen(true);
   };
 
   return (
     <>
-      <Service item={edit} open={open} handleClose={() => setOpen(false)} />
+      <Service
+        item={edit}
+        open={open}
+        handleClose={() => setOpen(false)}
+        setData={setTableData}
+      />
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 700 }} aria-label="customized table">
           <TableHead>
@@ -99,4 +113,6 @@ export default function CustomizedTables({ data }) {
       </TableContainer>
     </>
   );
-}
+};
+
+export default CustomizedTables;

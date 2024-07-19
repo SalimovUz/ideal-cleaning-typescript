@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, ChangeEvent } from "react";
 import { Button, TextField, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { Order } from "@modal";
@@ -7,12 +7,18 @@ import { OrderTable } from "@ui";
 import { order } from "@service";
 import Pagination from "@mui/material/Pagination";
 
-const Index = () => {
+interface Params {
+  limit: number;
+  page: number;
+  name: string;
+}
+
+const Index: React.FC = () => {
   const [openOrder, setOpenOrder] = useState(false);
   const [openEditOrder, setOpenEditOrder] = useState(false);
   const [data, setData] = useState([]);
   const [count, setCount] = useState(0);
-  const [params, setParams] = useState({
+  const [params, setParams] = useState<Params>({
     limit: 10,
     page: 1,
     name: "",
@@ -29,7 +35,7 @@ const Index = () => {
       const response = await order.get(params);
       if (response.status === 200 && response?.data?.orders_list) {
         setData(response?.data?.orders_list);
-        let total = Math.ceil(response.data.total / params.limit);
+        const total = Math.ceil(response.data.total / params.limit);
         setCount(total);
       }
     } catch (error) {
@@ -41,14 +47,14 @@ const Index = () => {
     getData();
   }, [params]);
 
-  const handleChange = (event, value) => {
+  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setParams({
       ...params,
       page: value,
     });
   };
 
-  const handleSearchChange = (e) => {
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setParams({
       ...params,
       name: e.target.value,
@@ -62,10 +68,10 @@ const Index = () => {
       <div className="flex flex-col gap-4">
         <div className="flex justify-between items-center">
           <TextField
-          type="text"
+            type="text"
             variant="outlined"
             placeholder="Search Orders"
-            value={params.search}
+            value={params.name}
             onChange={handleSearchChange}
             InputProps={{
               startAdornment: (
